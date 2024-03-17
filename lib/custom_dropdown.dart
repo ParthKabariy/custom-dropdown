@@ -76,7 +76,7 @@ class CustomDropdown<T> extends StatefulWidget {
   final bool validateOnChange;
 
   /// Called when the item of the [CustomDropdown] should change.
-  final Function(T)? onChanged;
+  final Function(T?)? onChanged;
 
   /// Called when the list of items of the [CustomDropdown] should change.
   final Function(List<T>)? onListChanged;
@@ -455,9 +455,16 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                 onItemSelect: (T value) {
                   switch (widget._dropdownType) {
                     case _DropdownType.singleSelect:
-                      selectedItemNotifier.value = value;
-                      widget.onChanged?.call(value);
-                      formFieldState.didChange((value, []));
+                      if (selectedItemNotifier.value == value) {
+                        selectedItemNotifier.value = null;
+                        widget.onChanged?.call(null);
+                        formFieldState.didChange((null, []));
+                      } else {
+                        selectedItemNotifier.value = value;
+                        widget.onChanged?.call(value);
+                        formFieldState.didChange((value, []));
+                      }
+
                     case _DropdownType.multipleSelect:
                       final currentVal = selectedItemsNotifier.value.toList();
                       if (currentVal.contains(value)) {
@@ -528,7 +535,20 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                   hintBuilder: widget.hintBuilder,
                   headerBuilder: widget.headerBuilder,
                   headerListBuilder: widget.headerListBuilder,
-                  suffixIcon: decoration?.closedSuffixIcon,
+                  suffixIcon: selectedItemNotifier.value != null
+                      ? InkWell(
+                          onTap: () {
+                            selectedItemNotifier.value = null;
+                            widget.onChanged?.call(null);
+                            formFieldState.didChange((null, []));
+                          },
+                          child: Icon(
+                            Icons.close,
+                            size: 20,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      : decoration?.closedSuffixIcon,
                   fillColor: decoration?.closedFillColor,
                   maxLines: widget.maxlines,
                   headerPadding: widget.closedHeaderPadding,

@@ -1,9 +1,10 @@
 part of '../custom_dropdown.dart';
 
 // overlay icon
-const _defaultOverlayIconDown = Icon(
-  Icons.keyboard_arrow_down_rounded,
+final _defaultOverlayIconDown = Icon(
+  Icons.arrow_drop_down,
   size: 20,
+  color: Colors.grey[600],
 );
 
 class _DropDownField<T> extends StatefulWidget {
